@@ -113,20 +113,12 @@ class WPStarter {
 	 * Requires Composer generated autoload file and .php files in the directory `inc`
 	 */
 	protected function autoload() {
-		$autoload_file_path = $this->plugin_dir_path . 'vendor/autoload.php';
-		if ( file_exists( $autoload_file_path ) ) {
-			require $autoload_file_path;
-			$paths = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->plugin_dir_path . 'inc' ), RecursiveIteratorIterator::SELF_FIRST );
-			foreach ( $paths as $path => $unused ) {
-				$path = str_replace( '\\', '/', $path );
-				if ( preg_match( '/\/[\w-]+\.php$/', $path ) ) {
-					require $path;
-				}
+		$paths = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $this->plugin_dir_path . 'inc' ), \RecursiveIteratorIterator::SELF_FIRST );
+		foreach ( $paths as $path => $unused ) {
+			$path = str_replace( '\\', '/', $path );
+			if ( preg_match( '/\/[\w-]+\.php$/', $path ) ) {
+				require $path;
 			}
-		} else {
-			// @codingStandardsIgnoreStart
-			wp_die( sprintf( __( 'Plugin <strong>%1$s</strong> not installed yet, run the `<strong><code>composer install</code></strong>` command on a terminal from within the plugin directory and activate the plugin again from the <a href="%2$s">plugins page</a>.', '{{starter}}' ), $this->plugin_slug, admin_url( 'plugins.php' ) ) ); // XSS OK.
-			// @codingStandardsIgnoreEnd
 		}
 	}
 
