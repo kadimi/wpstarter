@@ -1,0 +1,17 @@
+{
+    "name": "kadimi/wpstarter",
+    "description": "WP Starter",
+    "require": {
+        "tgmpa/tgm-plugin-activation": "^2.6"
+    },
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Nabil Kadimi",
+            "email": "nabil@kadimi.com"
+        }
+    ],
+    "autoload": {
+        "files": [ "src/WPStarter.class.php" ]
+    }
+}
