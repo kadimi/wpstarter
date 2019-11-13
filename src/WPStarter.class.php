@@ -231,6 +231,8 @@ class WPStarter {
 		$parts           = explode( '.', $path );
 		$extension       = end( $parts );
 
+		$args = apply_filters( $this->plugin_slug . '::enqueue-asset', $args, $path );
+
 		if ( ! file_exists( $args['abspath'] ) ) {
 			$this->watchdog( sprintf( 'File <code>%s</code> does not exist', $path ), 'notice' );
 			return;
