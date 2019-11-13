@@ -217,12 +217,14 @@ class WPStarter {
 	public function enqueue_asset( $path, $args = [] ) {
 
 		$default_args = [
-			'is_admin'  => false,
-			'handle'    => $this->plugin_slug . '-' . sanitize_user( basename( $path ), true ),
-			'deps'      => null,
-			'ver'       => $this->plugin_version,
-			'in_footer' => null,
-			'media'     => null,
+			'is_admin'    => false,
+			'handle'      => $this->plugin_slug . '-' . sanitize_user( basename( $path ), true ),
+			'deps'        => null,
+			'ver'         => $this->plugin_version,
+			'in_footer'   => null,
+			'media'       => null,
+			'object_name' => '',
+			'l10n'        => [],
 		];
 
 		$args           += $default_args;
