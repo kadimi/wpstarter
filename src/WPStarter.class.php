@@ -191,20 +191,22 @@ class WPStarter {
 	 * @todo Improve documentation.
 	 */
 	protected function enqueue_public_assets() {
-		$this->enqueue_asset( 'public/css/frontend-main.css' );
-		$this->enqueue_asset( 'public/js/frontend-main.js' );
-		$this->enqueue_asset(
-			'public/css/backend-main.css',
-			[
-				'is_admin' => true,
-			]
-		);
-		$this->enqueue_asset(
-			'public/js/backend-main.js',
-			[
-				'is_admin' => true,
-			]
-		);
+		add_action( 'init', function() {			
+			$this->enqueue_asset( 'public/css/frontend-main.css' );
+			$this->enqueue_asset( 'public/js/frontend-main.js' );
+			$this->enqueue_asset(
+				'public/css/backend-main.css',
+				[
+					'is_admin' => true,
+				]
+			);
+			$this->enqueue_asset(
+				'public/js/backend-main.js',
+				[
+					'is_admin' => true,
+				]
+			);
+		} );
 	}
 
 	/**
