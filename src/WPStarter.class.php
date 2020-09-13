@@ -155,15 +155,7 @@ class WPStarter {
 	 * @param  Array  $options TGMPA compatible options.
 	 */
 	protected function require_plugin( $name, $options = [] ) {
-		add_action(
-			'tgmpa_register',
-			function() use ( $name, $options ) {
-				$options['name']     = $name;
-				$options['slug']     = ! empty( $options['slug'] ) ? $options['slug'] : strtolower( preg_replace( '/[^\w\d]+/', '-', $name ) );
-				$options['required'] = true;
-				tgmpa( [ $options ] );
-			}
-		);
+		// The method does nothing.
 	}
 
 	/**
