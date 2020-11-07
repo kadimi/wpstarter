@@ -396,7 +396,7 @@ class WPStarter {
 	 * @return int          Seconds to time.
 	 */
 	public static function in( $time ) {
-		return strftime( $time ) - time();
+		return strtotime( $time ) - time();
 	}
 
 	/**
