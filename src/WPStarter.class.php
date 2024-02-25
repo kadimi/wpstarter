@@ -184,7 +184,7 @@ class WPStarter {
 	 */
 	protected function enqueue_public_assets() {
 		$this->enqueue_asset( 'public/css/frontend-main.css' );
-		$this->enqueue_asset( 'public/js/frontend-main.js' );
+		$this->enqueue_asset( 'public/js/frontend-main.js', [ 'deps' => [ 'jquery' ] ] );
 		$this->enqueue_asset(
 			'public/css/backend-main.css',
 			[
