@@ -9,6 +9,11 @@
         }
     ],
     "autoload": {
-        "files": [ "src/WPStarter.class.php" ]
+        "psr-4": {
+            "Kadimi\\WPStarter\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.3"
     }
 }
