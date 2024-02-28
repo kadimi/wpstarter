@@ -220,9 +220,18 @@ class WPStarter {
 		];
 
 		$args           += $default_args;
-		$args['abspath'] = $this->plugin_dir_path . $path;
-		$args['src']     = $this->plugin_dir_url . $path;
-		$parts           = explode( '.', $path );
+
+		if (filter_var($path, FILTER_VALIDATE_URL)) {
+			$is_valid_url    = true;
+			$args['abspath'] = null;
+			$args['src']     = $path;
+		} else {
+			$is_valid_url    = false;
+			$args['abspath'] = $this->plugin_dir_path . $path;
+			$args['src']     = $this->plugin_dir_url . $path;
+		}
+
+		$parts           = explode('.', $path);
 		$extension       = end( $parts );
 
 		$args = apply_filters( $this->plugin_slug . '::enqueue-asset', $args, $path );
