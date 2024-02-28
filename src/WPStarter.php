@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WP Starter.
  *
@@ -12,12 +13,13 @@ namespace Kadimi;
  */
 class WPStarter {
 
+
 	/**
 	 * Class instance
 	 *
 	 * @var object
 	 */
-	protected static $instances = [];
+	protected static $instances = array();
 
 	/**
 	 * Plugin slug.
@@ -79,7 +81,7 @@ class WPStarter {
 	 * @param  array $args Arguments.
 	 * @return Object
 	 */
-	public static function get_instance( $args = [] ) {
+	public static function get_instance( $args = array() ) {
 		if ( empty( self::$instances[ get_called_class() ] ) ) {
 			self::$instances[ get_called_class() ] = new static();
 			self::$instances[ get_called_class() ]->init( $args );
@@ -128,7 +130,7 @@ class WPStarter {
 	protected function activate() {
 		register_activation_hook(
 			$this->plugin_file,
-			function() {
+			function () {
 				set_transient( $this->plugin_slug, 1, self::in( '15 minutes' ) );
 			}
 		);
@@ -142,7 +144,7 @@ class WPStarter {
 	protected function l10n() {
 		add_action(
 			'plugins_loaded',
-			function() {
+			function () {
 				load_plugin_textdomain( $this->plugin_slug, false, dirname( $this->plugin_basename ) . '/lang' );
 			}
 		);
@@ -154,7 +156,7 @@ class WPStarter {
 	 * @param  String $name    Plugin name.
 	 * @param  Array  $options TGMPA compatible options.
 	 */
-	protected function require_plugin( $name, $options = [] ) {
+	protected function require_plugin( $name, $options = array() ) {
 		// The method does nothing.
 	}
 
@@ -164,7 +166,7 @@ class WPStarter {
 	protected function shortcodes() {
 		add_shortcode(
 			$this->plugin_slug,
-			function( $atts ) {
+			function ( $atts ) {
 				$args   = shortcode_atts(
 					array(
 						'dummy' => 'dummy',
@@ -184,18 +186,18 @@ class WPStarter {
 	 */
 	protected function enqueue_public_assets() {
 		$this->enqueue_asset( 'public/css/frontend-main.css' );
-		$this->enqueue_asset( 'public/js/frontend-main.js', [ 'deps' => [ 'jquery' ] ] );
+		$this->enqueue_asset( 'public/js/frontend-main.js', array( 'deps' => array( 'jquery' ) ) );
 		$this->enqueue_asset(
 			'public/css/backend-main.css',
-			[
+			array(
 				'is_admin' => true,
-			]
+			)
 		);
 		$this->enqueue_asset(
 			'public/js/backend-main.js',
-			[
+			array(
 				'is_admin' => true,
-			]
+			)
 		);
 	}
 
@@ -206,9 +208,8 @@ class WPStarter {
 	 * @param  String $path The path relative to the plugin directory.
 	 * @param  Array  $args Same as what you would provide to wp_enqueue_script or wp_enqueue_style with the addition of is_admin which enqueue the asset on the backend and l10n/object_name for scripts.
 	 */
-	public function enqueue_asset( $path, $args = [] ) {
-
-		$default_args = [
+	public function enqueue_asset( $path, $args = array() ) {
+		$default_args = array(
 			'is_admin'    => false,
 			'handle'      => $this->plugin_slug . '-' . sanitize_user( basename( $path ), true ),
 			'deps'        => null,
@@ -216,12 +217,12 @@ class WPStarter {
 			'in_footer'   => null,
 			'media'       => null,
 			'object_name' => '',
-			'l10n'        => [],
-		];
+			'l10n'        => array(),
+		);
 
-		$args           += $default_args;
+		$args += $default_args;
 
-		if (filter_var($path, FILTER_VALIDATE_URL)) {
+		if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
 			$is_valid_url    = true;
 			$args['abspath'] = null;
 			$args['src']     = $path;
@@ -231,34 +232,33 @@ class WPStarter {
 			$args['src']     = $this->plugin_dir_url . $path;
 		}
 
-		$parts           = explode('.', $path);
-		$extension       = end( $parts );
+		$parts     = explode( '.', $path );
+		$extension = end( $parts );
 
 		$args = apply_filters( $this->plugin_slug . '::enqueue-asset', $args, $path );
 
-		if ( ! file_exists( $args['abspath'] ) ) {
-			$this->watchdog( sprintf( 'File <code>%s</code> does not exist', $path ), 'notice' );
+		if ( ! in_array( $extension, array( 'css', 'js' ), true ) ) {
+			$this->watchdog( sprintf( 'File <code>%s</code> cannot be enqueued', $path ), 'notice' );
 			return;
 		}
 
-		if ( ! in_array( $extension, [ 'css', 'js' ], true ) ) {
-			$this->watchdog( sprintf( 'File <code>%s</code> cannot be enqueued', $path ), 'notice' );
+		if ( ! $is_valid_url && ! file_exists( $args['abspath'] ) ) {
+			$this->watchdog( sprintf( 'File <code>%s</code> does not exist', $path ), 'notice' );
 			return;
 		}
 
 		add_action(
 			( $args['is_admin'] ? 'admin' : 'wp' ) . '_enqueue_scripts',
-			function() use ( $args, $extension ) {
+			function () use ( $args, $extension ) {
 				switch ( $extension ) {
 					case 'css':
-						wp_enqueue_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
-						break;
+						return wp_enqueue_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
 					case 'js':
-						wp_enqueue_script( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['in_footer'] );
+						$return_enqueue = wp_enqueue_script( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['in_footer'] );
 						if ( ! empty( $args['object_name'] ) && ! empty( $args['l10n'] ) ) {
-							wp_localize_script( $args['handle'], $args['object_name'], $args['l10n'] );
+							$return_localize = wp_localize_script( $args['handle'], $args['object_name'], $args['l10n'] );
 						}
-						break;
+						return $return_enqueue && $return_localize;
 					default:
 						break;
 				}
@@ -273,7 +273,7 @@ class WPStarter {
 	 * @param  String $path The path relative to the plugin directory.
 	 * @param  Array  $args Same as what you would provide to wp_enqueue_script or wp_enqueue_style with the addition of is_admin which enqueue the asset on the backend.
 	 */
-	protected function admin_enqueue_asset( $path, $args = [] ) {
+	protected function admin_enqueue_asset( $path, $args = array() ) {
 		$args['is_admin'] = true;
 		return $this->enqueue_asset( $path, $args );
 	}
@@ -281,14 +281,14 @@ class WPStarter {
 	/**
 	 * Register scheduled task.
 	 *
-	 * @param  string  $name        The task name.
-	 * @param  calable $callback    The callback (must return true only on success).
-	 * @param  array   $parameters  Callback parameters.
-	 * @param  int     $minimum_interval    Minimum interval in seconds.
-	 * @param  array   $preferred   Preferred days and or hours.
-	 * @param  boolean $force Force Force task execution.
+	 * @param  string   $name        The task name.
+	 * @param  callable $callback    The callback (must return true only on success).
+	 * @param  array    $parameters  Callback parameters.
+	 * @param  int      $minimum_interval    Minimum interval in seconds.
+	 * @param  array    $preferred   Preferred days and or hours.
+	 * @param  boolean  $force Force Force task execution.
 	 */
-	public function schedule_task( $name, $callback, $parameters = [], $minimum_interval = 21600, $preferred = [], $force = false ) {
+	public function schedule_task( $name, $callback, $parameters = array(), $minimum_interval = 21600, $preferred = array(), $force = false ) {
 
 		/**
 		 * Prepare transient name.
@@ -299,7 +299,7 @@ class WPStarter {
 		 * Maybe force.
 		 */
 		if ( $force ) {
-			$preferred = [];
+			$preferred = array();
 			delete_transient( $transient_name );
 		}
 
@@ -356,7 +356,7 @@ class WPStarter {
 
 		add_action(
 			'init',
-			function() use ( $callback, $parameters, $minimum_interval, $transient_name ) {
+			function () use ( $callback, $parameters, $minimum_interval, $transient_name ) {
 
 				/**
 				 * Exit function if nothing to do.
@@ -416,7 +416,7 @@ class WPStarter {
 	 * @todo  Write method
 	 */
 	protected function watchdog( $msg, $type = 'notice' ) {
-		if ( in_array( $type, [ 'deprecated', 'notice', 'warning', 'error' ], true ) ) {
+		if ( in_array( $type, array( 'deprecated', 'notice', 'warning', 'error' ), true ) ) {
 			// The method does nothing yet.
 			return;
 		}
